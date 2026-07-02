@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marc Rhodes — CV</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: #0d1117; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  /* ── BUILD SCREEN ── */
+  #build-screen {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 40px 24px;
+    transition: opacity 0.6s ease;
+  }
+  #build-screen.fade-out { opacity: 0; pointer-events: none; }
+
+  .terminal {
+    width: 100%; max-width: 640px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  .terminal-bar {
+    background: #21262d;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 7px;
+    border-bottom: 1px solid #30363d;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red    { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green  { background: #28c840; }
+  .terminal-title {
+    flex: 1; text-align: center;
+    font-size: 11px; color: #6e7681;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  }
+
+  .terminal-body {
+    padding: 20px 22px 28px;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    min-height: 320px;
+  }
+
+  .line { display: block; white-space: pre; }
+  .line.cmd   { color: #c9d1d9; }
+  .line.ok    { color: #3fb950; }
+  .line.info  { color: #58a6ff; }
+  .line.dim   { color: #6e7681; }
+  .line.head  { color: #d2a8ff; }
+  .line.done  { color: #3fb950; font-weight: 700; }
+
+  .cursor {
+    display: inline-block; width: 8px; height: 14px;
+    background: #3fb950; vertical-align: middle;
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .build-label {
+    margin-top: 24px;
+    font-size: 11px;
+    color: #6e7681;
+    font-family: 'Cascadia Code', Consolas, monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── CV CONTENT ── */
+  #cv-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  #cv-content.visible {
+    display: block;
+    opacity: 0;
+  }
+  #cv-content.fade-in {
+    opacity: 1;
+  }
+
+  /* back link */
+  .cv-nav {
+    background: #0B1E3D;
+    padding: 10px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cv-nav a {
+    color: rgba(255,255,255,0.65); text-decoration: none;
+    font-size: 12px; font-family: 'Segoe UI', system-ui, sans-serif;
+    transition: color 0.15s;
+  }
+  .cv-nav a:hover { color: #fff; }
+  .cv-built {
+    font-size: 11px; color: rgba(255,255,255,0.35);
+    font-family: 'Cascadia Code', Consolas, monospace;
+  }
+
+  /* ── CV STYLES ── */
+  .cv-body {
+    font-family: 'Georgia', serif;
+    font-size: 10.5pt;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 48px;
+  }
+
+  .header {
+    border-bottom: 2.5px solid #8B1A1A;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .header-text { flex: 1; }
+  .headshot {
+    width: 108px; height: 135px;
+    object-fit: cover; object-position: center 28%;
+    border-radius: 3px; flex-shrink: 0;
+  }
+  h1 {
+    font-family: 'Arial', sans-serif;
+    font-size: 26pt; font-weight: 700;
+    letter-spacing: 0.5px; color: #0B1E3D; margin-bottom: 2px;
+  }
+  .subtitle {
+    font-family: 'Arial', sans-serif;
+    font-size: 11pt; color: #8B1A1A; font-style: italic; margin-bottom: 10px;
+  }
+  .contact-row {
+    font-family: 'Arial', sans-serif;
+    font-size: 9pt; color: #444;
+    display: flex; flex-wrap: nowrap; gap: 14px; white-space: nowrap;
+  }
+  .contact-row a { color: #444; text-decoration: none; }
+  .contact-row a:hover { text-decoration: underline; }
+
+  .summary { margin-bottom: 20px; line-height: 1.6; color: #2a2a2a; }
+
+  h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 10pt; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #0B1E3D;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3px; margin-bottom: 10px; margin-top: 18px;
+  }
+
+  .role { margin-bottom: 14px; }
+  .role-header {
+    display: flex; justify-content: space-between;
+    align-items: baseline; flex-wrap: wrap; gap: 4px; margin-bottom: 1px;
+  }
+  .role-title { font-family: 'Arial', sans-serif; font-size: 10.5pt; font-weight: 700; color: #0B1E3D; }
+  .role-dates { font-family: 'Arial', sans-serif; font-size: 9pt; color: #666; white-space: nowrap; }
+  .role-company { font-family: 'Arial', sans-serif; font-size: 9.5pt; color: #8B1A1A; margin-bottom: 5px; }
+
+  ul { padding-left: 16px; line-height: 1.55; }
+  li { margin-bottom: 3px; }
+
+  .competencies { line-height: 1.7; color: #2a2a2a; }
+  .comp-group { margin-bottom: 4px; }
+  .comp-label { font-family: 'Arial', sans-serif; font-size: 9pt; font-weight: 700; color: #0B1E3D; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+  .cert-item, .edu-item { font-family: 'Arial', sans-serif; font-size: 9.5pt; margin-bottom: 4px; line-height: 1.4; }
+  .cert-year { color: #666; font-size: 9pt; }
+  .in-progress { color: #8B1A1A; font-style: italic; font-size: 9pt; }
+
+  @media print {
+    .cv-nav { display: none; }
+    .cv-body { padding: 28px 36px; font-size: 10pt; }
+    h1 { font-size: 22pt; }
+    @page { margin: 0; size: A4; }
+  }
+  @media (max-width: 600px) {
+    .cv-body { padding: 28px 20px; }
+    .contact-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BUILD SCREEN -->
+<div id="build-screen">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+      <div class="terminal-title">cv-builder — zsh</div>
+    </div>
+    <div class="terminal-body" id="terminal-output">
+      <span class="cursor" id="cursor"></span>
+    </div>
+  </div>
+  <div class="build-label">building cv from project metadata&hellip;</div>
+</div>
+
+<!-- CV CONTENT -->
+<div id="cv-content">
+  <div class="cv-nav">
+    <a href="index.html">← Back to portfolio</a>
+    <span class="cv-built" id="built-stamp"></span>
+  </div>
+  <div class="cv-body">
+
+    <div class="header">
+      <img src="assets/headshot.png" alt="Marc Rhodes" class="headshot">
+      <div class="header-text">
+        <h1>Marc Rhodes</h1>
+        <div class="subtitle">CTO &amp; Salesforce Developer</div>
+        <div class="contact-row">
+          <span>📍 Offenbach am Main, Germany</span>
+          <a href="mailto:marc.rhodes80@gmail.com">marc.rhodes80@gmail.com</a>
+          <a href="https://www.linkedin.com/in/marc-rhodes-9314b6266/" target="_blank">LinkedIn</a>
+          <a href="https://github.com/marc-rhodes" target="_blank">GitHub</a>
+          <a href="https://marc-rhodes.github.io" target="_blank">Portfolio</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="summary">
+      Chief Technology Officer and Salesforce Developer with broad technical ownership across custom Apex/LWC development,
+      Microsoft 365/SharePoint, front-end web development, GDPR compliance, AI-driven automation, and technical project
+      management. Salesforce consultant across Sales, Service, Experience, and Health Cloud. Focused on scalable architecture,
+      security, and measurable business outcomes.
+    </p>
+
+    <h2>Core Competencies</h2>
+    <div class="competencies">
+      <div class="comp-group">
+        <span class="comp-label">Salesforce Development: </span>Apex · SOQL · Lightning Web Components · Queueable/Batch Apex · REST/SOAP APIs · @InvocableMethod · @RestResource
+      </div>
+      <div class="comp-group">
+        <span class="comp-label">Salesforce Platform: </span>Sales Cloud · Service Cloud · Experience Cloud · Health Cloud · Field Service Lightning
+      </div>
+      <div class="comp-group">
+        <span class="comp-label">Automation &amp; Config: </span>Record/Screen/Scheduled Flows · Approval Processes · Named Credentials · OAuth · Platform Events
+      </div>
+      <div class="comp-group">
+        <span class="comp-label">Front-End &amp; Web: </span>HTML · CSS · JavaScript · Lightning Web Components
+      </div>
+      <div class="comp-group">
+        <span class="comp-label">Infrastructure &amp; Tooling: </span>Microsoft 365 · SharePoint · GCP / Cloud Run · Brevo API · OpenAI API · Salesforce CLI · SFDX · Git
+      </div>
+      <div class="comp-group">
+        <span class="comp-label">Security &amp; Compliance: </span>Security Model (OWD / Roles / Profiles / FLS) · Permission Sets · GDPR Implementation · MFA Enforcement · SharePoint Security
+      </div>
+      <div class="comp-group">
+        <span class="comp-label">Leadership: </span>Technical Project Management · Milestone Tracking · Vendor Management · Team Mentoring · Technical Documentation · Agile/SCRUM
+      </div>
+    </div>
+
+    <h2>Professional Experience</h2>
+
+    <div class="role">
+      <div class="role-header">
+        <span class="role-title">Chief Technology Officer</span>
+        <span class="role-dates">Apr 2025 – Present</span>
+      </div>
+      <div class="role-company">AVL Recruiting Group GmbH &nbsp;·&nbsp; Munich, DE (remote)</div>
+      <ul>
+        <li>Full technical ownership of Salesforce org: custom Apex classes, Lightning Web Components, Experience Cloud opt-out portal, and Brevo REST integration for automated candidate outreach at scale.</li>
+        <li>Architected GDPR Art. 17 compliance module — file erasure service, domain-keyed blacklist suppression, and token-authenticated opt-out portal on Experience Cloud.</li>
+        <li>Manage Microsoft 365 and SharePoint infrastructure, security settings, and user administration org-wide.</li>
+        <li>Lead front-end development (HTML/CSS/JS) and technical project management including milestone tracking across all active initiatives.</li>
+        <li>Oversee AI-powered B2B outreach pipeline (GCP Cloud Run, Python, OpenAI, Brevo) and managed full contractor handoff and documentation.</li>
+      </ul>
+    </div>
+
+    <div class="role">
+      <div class="role-header">
+        <span class="role-title">Salesforce Consultant (Freelance)</span>
+        <span class="role-dates">2024</span>
+      </div>
+      <div class="role-company">AVL Recruiting Group GmbH &nbsp;·&nbsp; Munich, DE (remote)</div>
+      <ul>
+        <li>Built candidate/job shortlist system with multi-condition safety gates: placement status exclusion, blacklist matching, and 6-week ownership window logic.</li>
+        <li>Delivered org security hardening: MFA enforcement, full profile/permission-set restructure, and principle of least privilege across all user roles.</li>
+      </ul>
+    </div>
+
+    <div class="role">
+      <div class="role-header">
+        <span class="role-title">Lead Salesforce Health Cloud Consultant</span>
+        <span class="role-dates">Sep 2024 – Apr 2025</span>
+      </div>
+      <div class="role-company">Breakthrough Solutions &nbsp;·&nbsp; Remote, DE</div>
+      <ul>
+        <li>Led Health Cloud implementation: patient Experience portal with secure guest access, GDPR compliance, Medication Management, Goals, and Care Plans for clinical pathway modelling.</li>
+        <li>Authored all technical documentation; produced bilingual training materials reducing new-hire ramp-up to under one week.</li>
+        <li>Mentored junior administrators in Health Cloud features, Flow best practices, and governance.</li>
+      </ul>
+    </div>
+
+    <div class="role">
+      <div class="role-header">
+        <span class="role-title">Salesforce Administrator (Contract)</span>
+        <span class="role-dates">Dec 2024 – Feb 2025</span>
+      </div>
+      <div class="role-company">Stoneberg GmbH &nbsp;·&nbsp; Remote, DE</div>
+      <ul>
+        <li>Designed secure REST integration via Named Credentials and OAuth to sync with CloudTalk VoIP and Google Workspace, with error handling and logging.</li>
+        <li>Automated call logging and quote approval screen flows; enforced account ownership rules to prevent duplicate outreach.</li>
+      </ul>
+    </div>
+
+    <div class="role">
+      <div class="role-header">
+        <span class="role-title">Technical Director &amp; Google Workspace Admin</span>
+        <span class="role-dates">Sep 2020 – Jan 2023</span>
+      </div>
+      <div class="role-company">First Baptist Church &nbsp;·&nbsp; Florida, USA</div>
+      <ul>
+        <li>Managed IT network supporting 300+ users; implemented 2FA, password policies, and compliance controls.</li>
+        <li>Oversaw live streaming infrastructure, media production, and social content operations.</li>
+      </ul>
+    </div>
+
+    <h2>Certifications &amp; Education</h2>
+    <div class="two-col">
+      <div>
+        <div class="cert-item">Salesforce Certified Administrator <span class="cert-year">— 2024</span></div>
+        <div class="cert-item">Salesforce Certified Associate <span class="cert-year">— 2023</span></div>
+        <div class="cert-item">Platform App Builder <span class="in-progress">— in progress</span></div>
+        <div class="cert-item">AI / KI Studies <span class="in-progress">— in progress</span></div>
+      </div>
+      <div>
+        <div class="edu-item"><strong>B.S., Theology &amp; Humanitarian Studies</strong></div>
+        <div class="edu-item" style="color:#666;">Berean Baptist College, USA</div>
+        <div class="edu-item" style="margin-top:8px;"><strong>Salesforce Consultant Training</strong></div>
+        <div class="edu-item" style="color:#666;">Digital Career Institute, DE — 2023–2024</div>
+      </div>
+    </div>
+
+  </div><!-- /cv-body -->
+</div><!-- /cv-content -->
+
+<script>
+const LINES = [
+  { text: '$ sf project retrieve start --metadata ApexClass,Flow,CustomObject', cls: 'cmd', delay: 0 },
+  { text: '  ✓  Retrieved 24 Apex classes',          cls: 'ok',   delay: 480 },
+  { text: '  ✓  Retrieved 8 Record-Triggered Flows', cls: 'ok',   delay: 220 },
+  { text: '  ✓  Retrieved 6 Custom Metadata types',  cls: 'ok',   delay: 200 },
+  { text: '',                                         cls: 'dim',  delay: 180 },
+  { text: '$ node scripts/build-cv.js',               cls: 'cmd',  delay: 260 },
+  { text: '',                                         cls: 'dim',  delay: 120 },
+  { text: '  [experience]',                           cls: 'head', delay: 200 },
+  { text: '  ✓  AVL Recruiting Group GmbH  →  CTO, Apr 2025 – present',      cls: 'ok', delay: 220 },
+  { text: '  ✓  Breakthrough Solutions      →  Health Cloud Lead, 2024–2025', cls: 'ok', delay: 210 },
+  { text: '  ✓  Stoneberg GmbH             →  SF Admin, 2024–2025',          cls: 'ok', delay: 200 },
+  { text: '',                                         cls: 'dim',  delay: 140 },
+  { text: '  [apex patterns detected]',               cls: 'head', delay: 180 },
+  { text: '  ✓  Queueable + Database.AllowsCallouts + self-chain', cls: 'ok', delay: 230 },
+  { text: '  ✓  @InvocableMethod with typed request/result',       cls: 'ok', delay: 210 },
+  { text: '  ✓  @RestResource + HMAC-SHA256 signature validation', cls: 'ok', delay: 210 },
+  { text: '  ✓  Custom Metadata transaction cache pattern',        cls: 'ok', delay: 210 },
+  { text: '',                                         cls: 'dim',  delay: 140 },
+  { text: '  [certifications]',                       cls: 'head', delay: 180 },
+  { text: '  ✓  Salesforce Administrator (2024)',     cls: 'ok',   delay: 200 },
+  { text: '  ✓  Salesforce Associate (2023)',         cls: 'ok',   delay: 180 },
+  { text: '  ⏳  Platform App Builder — in progress', cls: 'info', delay: 190 },
+  { text: '',                                         cls: 'dim',  delay: 140 },
+  { text: '  Rendering HTML…',                        cls: 'dim',  delay: 340 },
+  { text: '',                                         cls: 'dim',  delay: 300 },
+  { text: '  ✓  Done in 1.4s',                       cls: 'done', delay: 260 },
+];
+
+const output   = document.getElementById('terminal-output');
+const cursor   = document.getElementById('cursor');
+const buildEl  = document.getElementById('build-screen');
+const cvEl     = document.getElementById('cv-content');
+const stamp    = document.getElementById('built-stamp');
+
+const now = new Date();
+const pad = n => String(n).padStart(2,'0');
+stamp.textContent = `built ${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+let t = 400;
+LINES.forEach((item, i) => {
+  t += item.delay;
+  setTimeout(() => {
+    const span = document.createElement('span');
+    span.className = 'line ' + item.cls;
+    span.textContent = item.text;
+    output.insertBefore(span, cursor);
+    if (i === LINES.length - 1) {
+      cursor.style.display = 'none';
+      setTimeout(reveal, 800);
+    }
+  }, t);
+});
+
+function reveal() {
+  buildEl.classList.add('fade-out');
+  setTimeout(() => {
+    buildEl.style.display = 'none';
+    cvEl.style.display = 'block';
+    cvEl.classList.add('visible');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { cvEl.classList.add('fade-in'); });
+    });
+  }, 650);
+}
+</script>
+</body>
+</html>
